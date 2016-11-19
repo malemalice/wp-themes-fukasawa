@@ -4,56 +4,56 @@
 add_action( 'after_setup_theme', 'fukasawa_setup' );
 
 function fukasawa_setup() {
-	
+
 	// Automatic feed
 	add_theme_support( 'automatic-feed-links' );
-	
+
 	// Set content-width
 	global $content_width;
 	if ( ! isset( $content_width ) ) $content_width = 620;
-	
+
 	// Post thumbnails
 	add_theme_support( 'post-thumbnails' );
 	set_post_thumbnail_size ( 88, 88, true );
-	
+
 	add_image_size( 'post-image', 973, 9999 );
 	add_image_size( 'post-thumb', 508, 9999 );
-	
+
 	// Post formats
 	add_theme_support( 'post-formats', array( 'gallery', 'image', 'video' ) );
-		
+
 	// Jetpack infinite scroll
 	add_theme_support( 'infinite-scroll', array(
 		'type' 				=> 		'click',
 	    'container'			=> 		'posts',
 		'footer' 			=> 		false,
 	) );
-	
+
 	// Title tag
 	add_theme_support('title-tag');
-	
+
 	// Add nav menu
 	register_nav_menu( 'primary', __('Primary Menu','fukasawa') );
-	
+
 	// Make the theme translation ready
 	load_theme_textdomain('fukasawa', get_template_directory() . '/languages');
-	
+
 	$locale = get_locale();
 	$locale_file = get_template_directory() . "/languages/$locale.php";
 	if ( is_readable($locale_file) )
 	  require_once($locale_file);
-	
+
 }
 
 
 // Register and enqueue Javascript files
 function fukasawa_load_javascript_files() {
 
-	if ( !is_admin() ) {		
+	if ( !is_admin() ) {
 		wp_enqueue_script( 'masonry' );
 		wp_enqueue_script( 'fukasawa_flexslider', get_template_directory_uri().'/js/flexslider.min.js', array('jquery'), '', true );
 		wp_enqueue_script( 'fukasawa_global', get_template_directory_uri().'/js/global.js', array('jquery'), '', true );
-		if ( is_singular() ) wp_enqueue_script( "comment-reply" );		
+		if ( is_singular() ) wp_enqueue_script( "comment-reply" );
 	}
 }
 
@@ -82,24 +82,35 @@ add_action( 'init', 'fukasawa_add_editor_styles' );
 
 
 // Add sidebar widget area
-add_action( 'widgets_init', 'fukasawa_sidebar_reg' ); 
+add_action( 'widgets_init', 'fukasawa_sidebar_reg' );
 
 function fukasawa_sidebar_reg() {
 	register_sidebar(array(
-	  'name' => __( 'Sidebar', 'fukasawa' ),
+	  'name' => __( 'Sidebar Main', 'fukasawa' ),
 	  'id' => 'sidebar',
-	  'description' => __( 'Widgets in this area will be shown in the sidebar.', 'fukasawa' ),
+	  'description' => __( 'Widgets in this area will be shown in the main sidebar.', 'fukasawa' ),
 	  'before_title' => '<h3 class="widget-title">',
 	  'after_title' => '</h3>',
 	  'before_widget' => '<div class="widget %2$s"><div class="widget-content">',
 	  'after_widget' => '</div><div class="clear"></div></div>'
 	));
+
+	register_sidebar(array(
+		'name' => __( 'Sidebar Main Right', 'fukasawa' ),
+		'id' => 'sidebar_main_right',
+		'description' => __( 'Widgets in this area will be shown in the right sidebar.', 'fukasawa' ),
+		'before_title' => '<h3 class="widget-title">',
+		'after_title' => '</h3>',
+		'before_widget' => '<div class="widget %2$s"><div class="widget-content">',
+		'after_widget' => '</div><div class="clear"></div></div>'
+	));
+
 }
 
 
 // Add theme widgets
-require_once (get_template_directory() . "/widgets/dribbble-widget.php");  
-require_once (get_template_directory() . "/widgets/flickr-widget.php");  
+require_once (get_template_directory() . "/widgets/dribbble-widget.php");
+require_once (get_template_directory() . "/widgets/flickr-widget.php");
 require_once (get_template_directory() . "/widgets/recent-comments.php");
 require_once (get_template_directory() . "/widgets/recent-posts.php");
 require_once (get_template_directory() . "/widgets/video-widget.php");
@@ -148,9 +159,9 @@ add_filter( 'excerpt_more', 'fukasawa_new_excerpt_more' );
 
 // Add body class if is_mobile
 add_filter('body_class','fukasawa_is_mobile_body_class');
- 
+
 function fukasawa_is_mobile_body_class( $classes ){
- 
+
     /* using mobile browser */
     if ( wp_is_mobile() ){
         $classes[] = 'wp-is-mobile';
@@ -184,7 +195,7 @@ function fukasawa_get_comment_excerpt($comment_ID = 0, $num_words = 20) {
 
 
 // Style the admin area
-function fukasawa_admin_area_style() { 
+function fukasawa_admin_area_style() {
    echo '
 <style type="text/css">
 
@@ -204,7 +215,7 @@ function fukasawa_flexslider($size) {
 
 	if ( is_page()) :
 		$attachment_parent = $post->ID;
-	else : 
+	else :
 		$attachment_parent = get_the_ID();
 	endif;
 
@@ -217,25 +228,25 @@ function fukasawa_flexslider($size) {
                 'orderby'        => 'menu_order',
                 'order'           => 'ASC',
 	))) { ?>
-	
+
 		<div class="flexslider">
-		
+
 			<ul class="slides">
-	
-				<?php foreach($images as $image) { 
-				
+
+				<?php foreach($images as $image) {
+
 					$attimg = wp_get_attachment_image($image->ID, $size); ?>
-					
+
 					<li>
 						<?php echo $attimg; ?>
 					</li>
-					
+
 				<?php }; ?>
-		
+
 			</ul>
-			
+
 		</div><?php
-		
+
 	}
 }
 
@@ -248,11 +259,11 @@ function fukasawa_comment( $comment, $args, $depth ) {
 		case 'pingback' :
 		case 'trackback' :
 	?>
-	
+
 	<li <?php comment_class(); ?> id="comment-<?php comment_ID(); ?>">
-	
+
 		<?php __( 'Pingback:', 'fukasawa' ); ?> <?php comment_author_link(); ?> <?php edit_comment_link( __( 'Edit', 'fukasawa' ), '<span class="edit-link">', '</span>' ); ?>
-		
+
 	</li>
 	<?php
 			break;
@@ -260,60 +271,60 @@ function fukasawa_comment( $comment, $args, $depth ) {
 		global $post;
 	?>
 	<li <?php comment_class(); ?> id="li-comment-<?php comment_ID(); ?>">
-	
+
 		<div id="comment-<?php comment_ID(); ?>" class="comment">
-			
+
 			<div class="comment-header">
-			
+
 				<?php echo get_avatar( $comment, 160 ); ?>
-				
+
 				<div class="comment-header-inner">
-											
+
 					<h4><?php echo get_comment_author_link(); ?></h4>
-					
+
 					<div class="comment-meta">
 						<a class="comment-date-link" href="<?php echo esc_url( get_comment_link( $comment->comment_ID ) ) ?>" title="<?php echo get_comment_date() . ' at ' . get_comment_time(); ?>"><?php echo get_comment_date(get_option('date_format')) ?></a>
 					</div> <!-- /comment-meta -->
-				
+
 				</div> <!-- /comment-header-inner -->
-			
+
 			</div>
 
 			<div class="comment-content post-content">
-			
+
 				<?php comment_text(); ?>
-				
+
 			</div><!-- /comment-content -->
-			
+
 			<div class="comment-actions">
-			
+
 				<?php if ( '0' == $comment->comment_approved ) : ?>
-				
+
 					<p class="comment-awaiting-moderation fright"><?php _e( 'Your comment is awaiting moderation.', 'fukasawa' ); ?></p>
-					
+
 				<?php endif; ?>
-				
+
 				<div class="fleft">
-			
-				<?php 
-					comment_reply_link( array( 
+
+				<?php
+					comment_reply_link( array(
 						'reply_text' 	=>  	__('Reply','fukasawa'),
-						'depth'			=> 		$depth, 
+						'depth'			=> 		$depth,
 						'max_depth' 	=> 		$args['max_depth'],
 						'before'		=>		'',
 						'after'			=>		''
-						) 
-					); 
+						)
+					);
 				?><?php edit_comment_link( __( 'Edit', 'fukasawa' ), '<span class="sep">/</span>', '' ); ?>
-				
+
 				</div>
-				
+
 				<div class="clear"></div>
-			
+
 			</div> <!-- /comment-actions -->
-										
+
 		</div><!-- /comment-## -->
-				
+
 	<?php
 		break;
 	endswitch;
@@ -326,41 +337,41 @@ endif;
 class fukasawa_Customize {
 
    public static function fukasawa_register ( $wp_customize ) {
-   
+
       //1. Define a new section (if desired) to the Theme Customizer
-      $wp_customize->add_section( 'fukasawa_options', 
+      $wp_customize->add_section( 'fukasawa_options',
          array(
             'title' => __( 'Options for Fukasawa', 'fukasawa' ), //Visible title of section
             'priority' => 35, //Determines what order this appears in
             'capability' => 'edit_theme_options', //Capability needed to tweak
             'description' => __('Allows you to customize theme settings for Fukasawa.', 'fukasawa'), //Descriptive tooltip
-         ) 
+         )
       );
-      
+
       $wp_customize->add_section( 'fukasawa_logo_section' , array(
 		    'title'       => __( 'Logo', 'fukasawa' ),
 		    'priority'    => 40,
 		    'description' => __('Upload a logo to replace the default site title in the sidebar/header', 'fukasawa'),
 	  ) );
-      
-      
+
+
       //2. Register new settings to the WP database...
       $wp_customize->add_setting( 'accent_color', //No need to use a SERIALIZED name, as `theme_mod` settings already live under one db record
          array(
             'default' => '#019EBD', //Default setting/value to save
             'type' => 'theme_mod', //Is this an 'option' or a 'theme_mod'?
             'transport' => 'postMessage', //What triggers a refresh of the setting? 'refresh' or 'postMessage' (instant)?
-            'sanitize_callback' => 'sanitize_hex_color'            
-         ) 
+            'sanitize_callback' => 'sanitize_hex_color'
+         )
       );
-	  
-	  $wp_customize->add_setting( 'fukasawa_logo', 
-      	array( 
+
+	  $wp_customize->add_setting( 'fukasawa_logo',
+      	array(
       		'sanitize_callback' => 'esc_url_raw'
-      	) 
+      	)
       );
-      
-      
+
+
       //3. Finally, we define the control itself (which links a setting to a section and renders the HTML controls)...
       $wp_customize->add_control( new WP_Customize_Color_Control( //Instantiate the color control class
          $wp_customize, //Pass the $wp_customize object (required)
@@ -370,15 +381,15 @@ class fukasawa_Customize {
             'section' => 'colors', //ID of the section this control should render in (can be one of yours, or a WordPress default section)
             'settings' => 'accent_color', //Which setting to load and manipulate (serialized is okay)
             'priority' => 10, //Determines the order this control appears in for the specified section
-         ) 
+         )
       ) );
-      
+
       $wp_customize->add_control( new WP_Customize_Image_Control( $wp_customize, 'fukasawa_logo', array(
 		    'label'    => __( 'Logo', 'fukasawa' ),
 		    'section'  => 'fukasawa_logo_section',
 		    'settings' => 'fukasawa_logo',
 	  ) ) );
-      
+
       //4. We can also change built-in settings by modifying properties. For instance, let's make some stuff use live preview JS...
       $wp_customize->get_setting( 'blogname' )->transport = 'postMessage';
       $wp_customize->get_setting( 'blogdescription' )->transport = 'postMessage';
@@ -386,9 +397,9 @@ class fukasawa_Customize {
 
    public static function fukasawa_header_output() {
       ?>
-      
-	      <!-- Customizer CSS --> 
-	      
+
+	      <!-- Customizer CSS -->
+
 	      <style type="text/css">
 	           <?php self::fukasawa_generate_css('body a', 'color', 'accent_color'); ?>
 	           <?php self::fukasawa_generate_css('body a:hover', 'color', 'accent_color'); ?>
@@ -421,28 +432,28 @@ class fukasawa_Customize {
 	           <?php self::fukasawa_generate_css('.comment-header h4 a:hover', 'color', 'accent_color'); ?>
 	           <?php self::fukasawa_generate_css('.bypostauthor.commet .comment-header:before', 'background', 'accent_color'); ?>
 	           <?php self::fukasawa_generate_css('.form-submit #submit:hover', 'background-color', 'accent_color'); ?>
-	           
+
 	           <?php self::fukasawa_generate_css('.nav-toggle.active', 'background-color', 'accent_color'); ?>
 	           <?php self::fukasawa_generate_css('.mobile-menu .current-menu-item:before', 'color', 'accent_color'); ?>
 	           <?php self::fukasawa_generate_css('.mobile-menu .current_page_item:before', 'color', 'accent_color'); ?>
-	           
+
 	           <?php self::fukasawa_generate_css('body#tinymce.wp-editor a', 'color', 'accent_color'); ?>
 	           <?php self::fukasawa_generate_css('body#tinymce.wp-editor a:hover', 'color', 'accent_color'); ?>
 	           <?php self::fukasawa_generate_css('body#tinymce.wp-editor fieldset legend', 'background', 'accent_color'); ?>
 	           <?php self::fukasawa_generate_css('body#tinymce.wp-editor blockquote:before', 'color', 'accent_color'); ?>
-	      </style> 
-	      
+	      </style>
+
 	      <!--/Customizer CSS-->
-	      
+
       <?php
    }
-   
+
    public static function fukasawa_live_preview() {
-      wp_enqueue_script( 
+      wp_enqueue_script(
            'fukasawa-themecustomizer', // Give the script a unique ID
            get_template_directory_uri() . '/js/theme-customizer.js', // Define the path to the JS file
            array(  'jquery', 'customize-preview' ), // Define dependencies
-           '', // Define a version (optional) 
+           '', // Define a version (optional)
            true // Specify whether to put in footer (leave this true)
       );
    }
