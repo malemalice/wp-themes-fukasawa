@@ -50,13 +50,6 @@
 
 </div> <!-- /content -->
 
-<div class="sidebar_right">
-	<div class="widgets">
-
-	 <?php dynamic_sidebar('sidebar_main_right'); ?>
-
-	</div>
-</div>
 
 
 <?php get_footer(); ?>
